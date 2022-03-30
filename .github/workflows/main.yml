@@ -1,0 +1,32 @@
+name: Build and test
+
+on: [push]
+
+jobs:
+  build:
+    name: build / lint / test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.16.0
+          run_install: |
+            - args: [--frozen-lockfile]
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

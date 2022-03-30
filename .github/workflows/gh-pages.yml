@@ -1,0 +1,45 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "website/**"
+      - ".github/workflows/gh-pages.yml"
+jobs:
+  build-and-deploy:
+    name: Build use-nft and deploy the website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.16.0
+          run_install: |
+            - args: [--frozen-lockfile]
+
+      - name: Build use-nft
+        run: pnpm build
+
+      - name: Build website/
+        env:
+          VITE_INFURA_KEY: ${{ secrets.INFURA_KEY }}
+        run: cd website && pnpm install --frozen-lockfile && pnpm build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages
+          folder: website/dist

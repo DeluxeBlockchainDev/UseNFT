@@ -1,0 +1,15 @@
+*.log
+.DS_Store
+node_modules/
+coverage/
+.cache/
+.env
+dist/
+
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
